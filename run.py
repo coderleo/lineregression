@@ -38,7 +38,8 @@ def open_file_df(file_name):
     data = pd.DataFrame(file_data,columns=columns,index=indexs)
     #print type()
     #data = data.fillna(0)
-    data[data=='NA'] = data.mean()
+    data[data=='NA'] = np.nan
+    data.interpolate()
     print data
 
     return data
