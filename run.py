@@ -1,7 +1,7 @@
 #coding=utf-8
 import re
 import numpy as np
-from sklearn import preprocessing
+from sklearn import preprocessing,linear_model
 import matplotlib.pyplot as plt
 import pandas as pd
 def open_file(file_name):
@@ -36,26 +36,51 @@ def open_file_df(file_name):
             
    
     data = pd.DataFrame(file_data,columns=columns,index=indexs)
+    #print data.columns
     #print type()
     #data = data.fillna(0)
     data[data=='NA'] = np.nan
-    data.interpolate()
-    print data
-
+    #print data
+    #a = data.head(2).values.tolist()
+    #print  data.head(2).loc[:,2:3]
+    for index,col in enumerate(data.columns):
+        if index<2:
+            continue
+        data.loc[:,col] = data.loc[:,col].astype(np.float)
+    
+    data = data.interpolate()
+    data = data.dropna()
+    #print data.isnull()
+    #print data
     return data
 def show_plt(data):
     #print data[:,0:-1]
-    print data['bdindexNum']
-    print data['sales']
-    plt.plot(data['bdindexNum'],data['sales'],'ro',label='ooo')
-    plt.legend()
+   #estoreNum
+    regr = linear_model.LinearRegression()
+    
+    X = []
+     
+    Y = []#data['sales']
+    for x,y in zip(data['newsNum'],data['sales']):
+        X.append([float(x)])
+        Y.append(float(y))
+    regr.fit(X,Y)
+    print regr.score(X,Y)
+    #regr.u
+    
+    plt.scatter(X,Y,color = 'blue')
+   # print regr.predict(X)
+    plt.plot(X,regr.predict(X),linewidth=4,color='red')
+   
+    plt.xticks(())
+    plt.yticks(())
     plt.show()
-
+   
 if __name__ == '__main__':
     
     data = open_file_df('data.txt')
     #print data
-    #show_plt(data)
+    show_plt(data)
     '''
     df = data.head(5)
     print df
